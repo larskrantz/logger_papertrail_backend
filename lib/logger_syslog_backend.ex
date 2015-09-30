@@ -1,0 +1,2 @@
+defmodule LoggerSyslogBackend do
+end
