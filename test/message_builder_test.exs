@@ -8,7 +8,7 @@ defmodule LoggerPapertrailBackend.MessageBuilderTest do
   test "will create a correct syslog message" do
     application = Dict.get(@meta, :application, nil)
     procid = Dict.get(@meta, :module, nil)
-    message = LoggerPapertrailBackend.MessageBuilder.build(:error, application, @timestamp, procid, "Hello PaperTrail!")
+    message = LoggerPapertrailBackend.MessageBuilder.build("Hello PaperTrail!", :error, application, @timestamp, procid)
     assert "<11>Oct  1 12:44:01 upptec_slack_robot Elixir.UpptecSlack.SlackBot Hello PaperTrail!" == message
   end
 

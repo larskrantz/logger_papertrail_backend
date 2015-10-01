@@ -5,10 +5,10 @@ defmodule LoggerPapertrailBackend.MessageBuilder do
 
     ## Example
 
-      iex> LoggerPapertrailBackend.MessageBuilder.build(:error, "my_system_name", {{2015,10,1}, {12,44,1}}, "Elixir.Hello.World", "Hello PaperTrail!")
+      iex> LoggerPapertrailBackend.MessageBuilder.build("Hello PaperTrail!", :error, "my_system_name", {{2015,10,1}, {12,44,1}}, "Elixir.Hello.World")
       "<11>Oct  1 12:44:01 my_system_name Elixir.Hello.World Hello PaperTrail!"
   """
-  def build(level, hostname, timestamp, tag, message) do
+  def build(message,level, hostname, timestamp, tag) do
     facility = :user # Papertrail does not care it seems, so just use :user
     priority = calculate_priority(facility, level)
     bsd_timestamp = create_bsd_timestamp(timestamp)
@@ -16,6 +16,7 @@ defmodule LoggerPapertrailBackend.MessageBuilder do
     "<#{priority}>#{bsd_timestamp} #{hostname} #{trimmed_tag} #{message}"
   end
 
+  defp create_bsd_timestamp({date,{h,m,s,_ms}}), do: create_bsd_timestamp({date,{h,m,s}})
   defp create_bsd_timestamp({{_y,mo,d},{h,m,s}}) do
     months = ~W{Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec}
     padded_day = d |> Integer.to_string |> String.rjust(2)
