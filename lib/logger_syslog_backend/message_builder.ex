@@ -1,17 +1,21 @@
 defmodule LoggerSyslogBackend.MessageBuilder do
   @doc """
-    Will build a syslog-message
+    Will build a syslog-message, roughly conforming to a BSD syslogmessage, RFC 3164.
+    But it is specially fitted to work with PaperTrail, http://papertrailapp.com
 
+    ## Example
+
+      iex> LoggerSyslogBackend.MessageBuilder.build(:error, "my_system_name", {{2015,10,1}, {12,44,1}}, "Elixir.Hello.World", "Hello PaperTrail!")
+      "<11>Oct  1 12:44:01 my_system_name Elixir.Hello.World Hello PaperTrail!"
   """
-  def build(level, facility, hostname, timestamp, message, metadata) do
-    application = Dict.get(metadata, :application, nil)
-    procid = Dict.get(metadata, :module, nil)
+  def build(level, hostname, timestamp, tag, message) do
+    facility = :user # Papertrail does not care it seems, so just use :user
     priority = calculate_priority(facility, level)
     bsd_timestamp = create_bsd_timestamp(timestamp)
-    "<#{priority}>#{bsd_timestamp} #{hostname} #{procid} #{message}"
+    trimmed_tag = trim_tag(tag)
+    "<#{priority}>#{bsd_timestamp} #{hostname} #{trimmed_tag} #{message}"
   end
 
-  # assuming logger logs in local timestamp atm
   defp create_bsd_timestamp({{_y,mo,d},{h,m,s}}) do
     months = ~W{Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec}
     padded_day = d |> Integer.to_string |> String.rjust(2)
@@ -20,8 +24,21 @@ defmodule LoggerSyslogBackend.MessageBuilder do
     "#{month} #{padded_day} #{zeropad.(h)}:#{zeropad.(m)}:#{zeropad.(s)}"
   end
 
-  # https://tools.ietf.org/html/rfc5424#section-6.2.1
+  defp trim_tag(tag) when is_binary(tag) do
+    # max length is 32. If greater, start with trimming away "Elixir." in module name
+    trimmed = tag |> String.strip()
+    case String.length(trimmed) do
+      l when l <= 32 -> trimmed
+      _ -> trimmed |> String.replace(~r/^Elixir\./,"") |> String.slice(0..31)
+    end
+  end
+
+  defp trim_tag(tag), do: trim_tag("#{tag}")
+
+  # https://tools.ietf.org/html/rfc3164#section-4.1.1
+
   defp calculate_priority(facility, level), do: facility(facility) * 8 + level(level)
+
   # Thanks to https://github.com/jkvor/erlang_syslog/blob/master/src/syslog.erl
 
   defp level(:emergency), do: 0 # system is unusable
