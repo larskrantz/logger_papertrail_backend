@@ -82,15 +82,14 @@ defmodule LoggerPapertrailBackend do
       enabled: Keyword.get(colors, :enabled, IO.ANSI.enabled?)}
   end
 
-  defp log_event(level, msg, ts, md, %{colors: colors} = state) do
-    application = Dict.get(md, :application, nil)
+  defp log_event(level, msg, ts, md, %{colors: colors, system: system } = state) do
+    application = system || Dict.get(md, :application, "unknown_elixir_application")
     procid = Dict.get(md, :module, nil)
 
-    output =
-      format_event(level, msg, ts, md, state)
+    format_event(level, msg, ts, md, state)
       |> color_event(level, colors)
       |> LoggerPapertrailBackend.MessageBuilder.build(level, application, ts, procid)
-    IO.write(state.device, "#{output}\n")
+      |> LoggerPapertrailBackend.Sender.send(state.host, state.port)
   end
 
   defp format_event(level, msg, ts, md, %{format: format, metadata: keys}) do
