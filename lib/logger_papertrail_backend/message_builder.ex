@@ -1,11 +1,11 @@
-defmodule LoggerSyslogBackend.MessageBuilder do
+defmodule LoggerPapertrailBackend.MessageBuilder do
   @doc """
     Will build a syslog-message, roughly conforming to a BSD syslogmessage, RFC 3164.
     But it is specially fitted to work with PaperTrail, http://papertrailapp.com
 
     ## Example
 
-      iex> LoggerSyslogBackend.MessageBuilder.build(:error, "my_system_name", {{2015,10,1}, {12,44,1}}, "Elixir.Hello.World", "Hello PaperTrail!")
+      iex> LoggerPapertrailBackend.MessageBuilder.build(:error, "my_system_name", {{2015,10,1}, {12,44,1}}, "Elixir.Hello.World", "Hello PaperTrail!")
       "<11>Oct  1 12:44:01 my_system_name Elixir.Hello.World Hello PaperTrail!"
   """
   def build(level, hostname, timestamp, tag, message) do

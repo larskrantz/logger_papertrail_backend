@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :logger_syslog_backend, key: :value
+#     config :logger_papertrail_backend, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:logger_syslog_backend, :key)
+#     Application.get_env(:logger_papertrail_backend, :key)
 #
 # Or configure a 3rd-party app:
 #

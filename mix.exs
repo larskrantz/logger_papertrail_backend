@@ -1,8 +1,8 @@
-defmodule LoggerSyslogBackend.Mixfile do
+defmodule LoggerPapertrailBackend.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :logger_syslog_backend,
+    [app: :logger_papertrail_backend,
      version: "0.0.1",
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
