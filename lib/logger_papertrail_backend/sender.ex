@@ -10,7 +10,6 @@ defmodule LoggerPapertrailBackend.Sender do
         {:ok, %{ host: host, port: port, ip: ip } }
       _ -> {:stop, "Invalid host: #{host}"}
     end
-
   end
 
   def start_link(host,port) do

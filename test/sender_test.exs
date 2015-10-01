@@ -18,7 +18,7 @@ defmodule SenderTest do
     port = 28000
     host = "localhost"
     TestServer.start(port,self)
-    LoggerPapertrailBackend.Sender.start_link(host, port)
+    {:ok, _pid} = LoggerPapertrailBackend.SenderSupervisor.start_link(host,port)
     LoggerPapertrailBackend.Sender.send("Hello UDP!")
     assert_receive {:ok, "Hello UDP!"}, 5000
     LoggerPapertrailBackend.Sender.stop
