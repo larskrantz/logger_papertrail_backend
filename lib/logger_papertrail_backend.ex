@@ -51,11 +51,19 @@ defmodule LoggerPapertrailBackend do
     format =
       Keyword.get(config, :format, @default_format)
       |> Logger.Formatter.compile
+
     level    = Keyword.get(config, :level)
     metadata = Keyword.get(config, :metadata, [])
+    system = Keyword.get(config, :system, nil)
+
+    [ host, portstr ] = Keyword.get(config, :host) |> String.split(":")
+    {port,_} = Integer.parse(portstr)
+
     colors   = configure_colors(config)
+
     %{format: format, metadata: metadata,
-      level: level, colors: colors, device: device}
+      level: level, colors: colors, device: device,
+      host: host, port: port, system: system }
   end
 
   defp configure_merge(env, options) do
