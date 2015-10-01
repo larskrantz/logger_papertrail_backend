@@ -27,6 +27,12 @@ defmodule LoggerPapertrailBackend.Sender do
     {:stop, :normal, :ok, state}
   end
 
+  def handle_cast({:reconfigure, host, port}, state) do
+    { :ok, ip } = :inet.getaddr(String.to_char_list(host), :inet)
+    updated_state = %{ host: host, port: port, ip: ip }
+    {:noreply, updated_state}
+  end
+
   def handle_info(:update_ip, state) do
     { :ok, ip } = :inet.getaddr(String.to_char_list(state.host), :inet)
     refresh_ip_periodically
@@ -36,6 +42,9 @@ defmodule LoggerPapertrailBackend.Sender do
 
   def send(message) do
     :ok = GenServer.cast(__MODULE__, {:send, message})
+  end
+  def reconfigure(host,port) when is_binary(host) and is_integer(port) do
+    :ok = GenServer.cast(__MODULE__, {:reconfigure, host, port})
   end
   def stop, do: GenServer.call(__MODULE__, :stop)
 

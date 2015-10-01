@@ -13,11 +13,15 @@ defmodule LoggerPapertrailBackend do
   end
 
   def init({device, opts}) do
-    {:ok, configure(device, opts)}
+    state = configure(device, opts)
+    LoggerPapertrailBackend.SenderSupervisor.start_link(state.host, state.port)
+    {:ok, state}
   end
 
   def handle_call({:configure, options}, state) do
-    {:ok, :ok, configure(state.device, options)}
+   state = configure(state.device, options)
+   LoggerPapertrailBackend.Sender.reconfigure(state.host, state.port)
+    {:ok, :ok, state}
   end
 
   def handle_event({_level, gl, _event}, state) when node(gl) != node() do
@@ -89,7 +93,7 @@ defmodule LoggerPapertrailBackend do
     format_event(level, msg, ts, md, state)
       |> color_event(level, colors)
       |> LoggerPapertrailBackend.MessageBuilder.build(level, application, ts, procid)
-      |> LoggerPapertrailBackend.Sender.send(state.host, state.port)
+      |> LoggerPapertrailBackend.Sender.send()
   end
 
   defp format_event(level, msg, ts, md, %{format: format, metadata: keys}) do
