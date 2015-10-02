@@ -2,50 +2,54 @@ defmodule LoggerPapertrailBackend.Sender do
   use GenServer
 
   @ip_update_interval_ms 60000
+  def init(_), do: init()
   def init() do
-    {:ok, %{ host: nil, port: nil, ip: nil }}
+    refresh_ips_in_intervalls
+    {:ok, %{}}
   end
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-   def handle_cast({ :send, message }, %{ ip: ip, port: port} = state) when is_integer(port) and is_tuple(ip) do
+   def handle_cast({ :send, message, host, port}, state) when is_integer(port) and is_binary(host) and is_binary(message) do
+    { ip, updated_state } = state |> resolve(host)
     {:ok, socket} = :gen_udp.open(0)
-    :gen_udp.send(socket, state.ip, state.port, message)
+    :gen_udp.send(socket, ip, port, message)
     :gen_udp.close(socket)
-    { :noreply, state }
-  end
-  def handle_cast({ :send, _message }, state), do: { :noreply, state }
-
-
-  def handle_cast({:reconfigure, host, port}, _state) do
-    ip = resolve_host(host)
-    updated_state = %{ host: host, port: port, ip: ip }
-    refresh_ip_in_intervalls
-    {:noreply, updated_state}
-  end
-
-  def handle_info(:update_ip, %{ host: host } = state) when is_binary(host) do
-    ip = resolve_host(host)
-    updated_state = state |> Map.put(:ip, ip)
-    refresh_ip_in_intervalls
     { :noreply, updated_state }
   end
-  def handle_info(:update_ip, state), do: { :noreply, state }
+  def handle_cast({ :send, _message, _host, _port }, state), do: { :noreply, state }
 
-  def send(message) do
-    :ok = GenServer.cast(__MODULE__, {:send, message})
+  def handle_info(:update_ip, state) do
+    updated_state = state |> Enum.reduce(%{},&refresh_ip/2)
+    refresh_ips_in_intervalls
+    { :noreply, updated_state }
   end
 
-  def reconfigure(host,port) when is_binary(host) and is_integer(port) do
-    :ok = GenServer.cast(__MODULE__, {:reconfigure, host, port})
+  def send(message, host, port) do
+    :ok = GenServer.cast(__MODULE__, {:send, message, host, port})
   end
 
+  defp refresh_ips_in_intervalls, do: :timer.send_after(@ip_update_interval_ms, self, :update_ip)
+  defp refresh_ip({ host, _ip }, state) do
+    ip = resolve_host(host)
+    state |> Map.put(host, ip)
+  end
 
-  defp refresh_ip_in_intervalls, do: :timer.send_after(@ip_update_interval_ms, self, :update_ip)
+  defp resolve(state, host) do
+    case Map.fetch(state, host) do
+      {:ok, ip} -> {ip, state}
+      _ -> state |> resolve_add_host(host)
+    end
+  end
   defp resolve_host(host) do
     { :ok, ip } = :inet.getaddr(String.to_char_list(host), :inet)
     ip
+  end
+  defp resolve_add_host(state, host) do
+    ip = resolve_host(host)
+    new_state = Map.put(state, host, ip)
+    { ip, new_state }
   end
 end

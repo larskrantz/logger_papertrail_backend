@@ -18,17 +18,7 @@ defmodule SenderTest do
     port = 28000
     host = "localhost"
     TestServer.start(port,self)
-    LoggerPapertrailBackend.Sender.reconfigure(host, port)
-    LoggerPapertrailBackend.Sender.send("Hello UDP!")
-    assert_receive {:ok, "Hello UDP!"}, 5000
-  end
-
-  test "should be possible to reconfigure" do
-    port = 28000
-    LoggerPapertrailBackend.Sender.reconfigure("google.com", port)
-    TestServer.start(port,self)
-    LoggerPapertrailBackend.Sender.reconfigure("localhost", port)
-    LoggerPapertrailBackend.Sender.send("Hello UDP!")
+    LoggerPapertrailBackend.Sender.send("Hello UDP!", host, port)
     assert_receive {:ok, "Hello UDP!"}, 5000
   end
 end
