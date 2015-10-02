@@ -1,9 +1,8 @@
 defmodule LoggerPapertrailBackend.Sender do
   use GenServer
 
-  @ip_udpdate_interval 60000
+  @ip_update_interval_ms 60000
   def init() do
-    refresh_ip_periodically
     {:ok, %{ host: nil, port: nil, ip: nil }}
   end
 
@@ -24,14 +23,16 @@ defmodule LoggerPapertrailBackend.Sender do
   end
 
   def handle_cast({:reconfigure, host, port}, state) do
-    { :ok, ip } = :inet.getaddr(String.to_char_list(host), :inet)
+    ip = resolve_host(host)
     updated_state = %{ host: host, port: port, ip: ip }
+    refresh_ip_in_intervalls
     {:noreply, updated_state}
   end
 
   def handle_info(:update_ip, %{ host: host } = state) when is_binary(host) do
-    { :ok, ip } = :inet.getaddr(String.to_char_list(host), :inet)
+    ip = resolve_host(host)
     updated_state = state |> Map.put(:ip, ip)
+    refresh_ip_in_intervalls
     { :noreply, updated_state }
   end
   def handle_info(:update_ip, state), do: { :noreply, state }
@@ -39,10 +40,15 @@ defmodule LoggerPapertrailBackend.Sender do
   def send(message) do
     :ok = GenServer.cast(__MODULE__, {:send, message})
   end
+
   def reconfigure(host,port) when is_binary(host) and is_integer(port) do
     :ok = GenServer.cast(__MODULE__, {:reconfigure, host, port})
   end
-  def stop, do: GenServer.call(__MODULE__, :stop)
 
-  defp refresh_ip_periodically, do: :timer.send_after(@ip_udpdate_interval, self, :update_ip)
+
+  defp refresh_ip_in_intervalls, do: :timer.send_after(@ip_update_interval_ms, self, :update_ip)
+  defp resolve_host(host) do
+    { :ok, ip } = :inet.getaddr(String.to_char_list(host), :inet)
+    ip
+  end
 end

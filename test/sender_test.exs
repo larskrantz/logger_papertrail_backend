@@ -18,21 +18,17 @@ defmodule SenderTest do
     port = 28000
     host = "localhost"
     TestServer.start(port,self)
-    {:ok, _pid} = LoggerPapertrailBackend.SenderSupervisor.start_link()
     LoggerPapertrailBackend.Sender.reconfigure(host, port)
     LoggerPapertrailBackend.Sender.send("Hello UDP!")
     assert_receive {:ok, "Hello UDP!"}, 5000
-    LoggerPapertrailBackend.Sender.stop
   end
 
   test "should be possible to reconfigure" do
     port = 28000
-    host = "google.com"
+    LoggerPapertrailBackend.Sender.reconfigure("google.com", port)
     TestServer.start(port,self)
-    LoggerPapertrailBackend.SenderSupervisor.start_link()
     LoggerPapertrailBackend.Sender.reconfigure("localhost", port)
     LoggerPapertrailBackend.Sender.send("Hello UDP!")
     assert_receive {:ok, "Hello UDP!"}, 5000
-    LoggerPapertrailBackend.Sender.stop
   end
 end

@@ -1,8 +1,14 @@
 defmodule LoggerPapertrailBackend do
   use Application
+  require Logger
 
   def start(_type, _args) do
-    LoggerPapertrailBackend.SenderSupervisor.start_link()
+    import Supervisor.Spec, warn: false
+    children = [
+      worker(LoggerPapertrailBackend.Sender, [])
+    ]
+    opts = [strategy: :one_for_one, name: LoggerPapertrailBackend.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 
 end
