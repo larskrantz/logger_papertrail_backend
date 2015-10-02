@@ -58,7 +58,7 @@ defmodule LoggerPapertrailBackend.Logger do
 
     level    = Keyword.get(config, :level)
     metadata = Keyword.get(config, :metadata, [])
-    system = Keyword.get(config, :system, nil)
+    system_name = Keyword.get(config, :system_name, nil)
 
     [ host, portstr ] = Keyword.get(config, :host) |> String.split(":")
     {port,_} = Integer.parse(portstr)
@@ -67,7 +67,7 @@ defmodule LoggerPapertrailBackend.Logger do
 
     %{format: format, metadata: metadata,
       level: level, colors: colors, device: device,
-      host: host, port: port, system: system }
+      host: host, port: port, system_name: system_name }
   end
 
   defp configure_merge(env, options) do
@@ -86,8 +86,8 @@ defmodule LoggerPapertrailBackend.Logger do
       enabled: Keyword.get(colors, :enabled, IO.ANSI.enabled?)}
   end
 
-  defp log_event(level, msg, ts, md, %{colors: colors, system: system } = state) do
-    application = system || Dict.get(md, :application, "unknown_elixir_application")
+  defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name } = state) do
+    application = system_name || Dict.get(md, :application, "unknown_elixir_application")
     procid = Dict.get(md, :module, nil)
 
     format_event(level, msg, ts, md, state)
