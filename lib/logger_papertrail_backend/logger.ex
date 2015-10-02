@@ -2,7 +2,7 @@ defmodule LoggerPapertrailBackend.Logger do
   use GenEvent
   @moduledoc false
 
-  @default_format "[$level] $metadata $message"
+  @default_format "[$level] $levelpad$metadata $message"
 
   def init(__MODULE__) do
     if Process.whereis(:user) do
