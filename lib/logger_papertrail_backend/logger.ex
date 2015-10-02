@@ -16,13 +16,11 @@ defmodule LoggerPapertrailBackend.Logger do
 
   def init({device, opts}) do
     state = configure(device, opts)
-    LoggerPapertrailBackend.Sender.reconfigure(state.host, state.port)
     {:ok, state}
   end
 
   def handle_call({:configure, options}, state) do
    state = configure(state.device, options)
-   LoggerPapertrailBackend.Sender.reconfigure(state.host, state.port)
     {:ok, :ok, state}
   end
 
@@ -95,7 +93,7 @@ defmodule LoggerPapertrailBackend.Logger do
     format_event(level, msg, ts, md, state)
       |> color_event(level, colors)
       |> LoggerPapertrailBackend.MessageBuilder.build(level, application, ts, procid)
-      |> LoggerPapertrailBackend.Sender.send()
+      |> LoggerPapertrailBackend.Sender.send(state.host, state.port)
   end
 
   defp format_event(level, msg, ts, md, %{format: format, metadata: keys}) do
