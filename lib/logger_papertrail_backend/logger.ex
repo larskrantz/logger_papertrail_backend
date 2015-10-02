@@ -2,6 +2,8 @@ defmodule LoggerPapertrailBackend.Logger do
   use GenEvent
   @moduledoc false
 
+  # Most of this is shamelessy copied from :console-backend
+
   @default_format "[$level] $levelpad$metadata $message"
 
   def init(__MODULE__) do
