@@ -16,13 +16,10 @@ defmodule LoggerPapertrailBackend.Sender do
     :gen_udp.close(socket)
     { :noreply, state }
   end
-  def handle_cast({ :send, message }, state), do: { :noreply, state }
+  def handle_cast({ :send, _message }, state), do: { :noreply, state }
 
-  def handle_call(:stop, _from, state) do
-    {:stop, :normal, :ok, state}
-  end
 
-  def handle_cast({:reconfigure, host, port}, state) do
+  def handle_cast({:reconfigure, host, port}, _state) do
     ip = resolve_host(host)
     updated_state = %{ host: host, port: port, ip: ip }
     refresh_ip_in_intervalls
