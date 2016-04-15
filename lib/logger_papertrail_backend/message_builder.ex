@@ -1,12 +1,12 @@
 defmodule LoggerPapertrailBackend.MessageBuilder do
-  @doc """
+  @doc ~S"""
     Will build a syslog-message, roughly conforming to a BSD syslogmessage, RFC 3164.
     But it is specially fitted to work with PaperTrail, http://papertrailapp.com
 
     ## Example
 
       iex> LoggerPapertrailBackend.MessageBuilder.build("Hello PaperTrail!", :error, "my_system_name", {{2015,10,1}, {12,44,1}}, "Elixir.Hello.World")
-      "<11>Oct  1 12:44:01 my_system_name Elixir.Hello.World Hello PaperTrail!"
+      "<11>Oct  1 12:44:01 my_system_name Hello.World Hello PaperTrail!"
   """
   def build(message,level, hostname, timestamp, tag) do
     facility = :user # Papertrail does not care it seems, so just use :user
@@ -26,15 +26,23 @@ defmodule LoggerPapertrailBackend.MessageBuilder do
   end
 
   defp trim_tag(tag) when is_binary(tag) do
-    # max length is 32. If greater, start with trimming away "Elixir." in module name
-    trimmed = tag |> String.strip()
-    case String.length(trimmed) do
-      l when l <= 32 -> trimmed
-      _ -> trimmed |> String.replace(~r/^Elixir\./,"") |> String.slice(0..31)
-    end
+    stripped = tag |> String.strip() |> String.replace("Elixir.", "")
+    trim_tag(stripped, String.length(stripped))
+  end
+  defp trim_tag(tag), do: trim_tag("#{tag}")
+
+  defp trim_tag(tag, current_length) when current_length <= 32, do: tag
+  defp trim_tag(tag, _) do
+    modules = tag |> String.split(".")
+    new_tag = trim_module_name(modules) |> Enum.join(".")
+    trim_tag(new_tag, String.length(new_tag))
   end
 
-  defp trim_tag(tag), do: trim_tag("#{tag}")
+  defp trim_module_name(modules), do: trim_module_name(modules, [])
+  defp trim_module_name([], state), do: Enum.reverse(state)
+  defp trim_module_name([ last_single_module | []], []), do: [ String.slice(last_single_module, 0, 32) ]
+  defp trim_module_name([ _head | tail ], state), do: (state |> Enum.reverse) ++ tail
+
 
   # https://tools.ietf.org/html/rfc3164#section-4.1.1
 
