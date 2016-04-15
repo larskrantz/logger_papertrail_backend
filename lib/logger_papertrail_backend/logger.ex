@@ -87,8 +87,8 @@ defmodule LoggerPapertrailBackend.Logger do
   end
 
   defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name } = state) do
-    application = system_name || Dict.get(md, :application, "unknown_elixir_application")
-    procid = Dict.get(md, :module, nil)
+    application = system_name || Keyword.get(md, :application, "unknown_elixir_application")
+    procid = Keyword.get(md, :module, nil)
 
     format_event(level, msg, ts, md, state)
       |> color_event(level, colors)
