@@ -1,5 +1,6 @@
 defmodule LoggerPapertrailBackend.Logger do
   use GenEvent
+  import LoggerPapertrailBackend.Configurator
   @moduledoc false
 
   # Most of this is shamelessy copied from :console-backend
@@ -58,16 +59,14 @@ defmodule LoggerPapertrailBackend.Logger do
 
     level    = Keyword.get(config, :level)
     metadata = Keyword.get(config, :metadata, [])
-    system_name = Keyword.get(config, :system_name, nil)
 
-    [ host, portstr ] = Keyword.get(config, :host) |> String.split(":")
-    {port,_} = Integer.parse(portstr)
+    target_config = configure_papertrail_target(config)
 
     colors   = configure_colors(config)
 
     %{format: format, metadata: metadata,
       level: level, colors: colors, device: device,
-      host: host, port: port, system_name: system_name }
+      host: target_config.host, port: target_config.port, system_name: target_config.system_name }
   end
 
   defp configure_merge(env, options) do
@@ -85,6 +84,7 @@ defmodule LoggerPapertrailBackend.Logger do
       error: Keyword.get(colors, :error, :red),
       enabled: Keyword.get(colors, :enabled, IO.ANSI.enabled?)}
   end
+
 
   defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name } = state) do
     application = system_name || Keyword.get(md, :application, "unknown_elixir_application")
