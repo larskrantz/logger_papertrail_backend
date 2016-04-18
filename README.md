@@ -2,6 +2,9 @@
 
 A [Papertrail](https://papertrailapp.com) backend for [Elixir Logger](http://elixir-lang.org/docs/stable/logger/Logger.html).
 
+[Change Log](CHANGELOG.md)
+
+
 ## Installation
 
 Available in [Hex](https://hex.pm). The package can be installed as:
@@ -9,7 +12,7 @@ Available in [Hex](https://hex.pm). The package can be installed as:
   1. Add `logger_papertrail_backend` to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:logger_papertrail_backend, "~> 0.0.2"}]
+          [{:logger_papertrail_backend, "~> 0.1.0"}]
         end
 
   2. Ensure `logger_papertrail_backend` is started before your application:
@@ -26,6 +29,14 @@ Available in [Hex](https://hex.pm). The package can be installed as:
           system_name: "Wizard",
           format: "$metadata $message"
 
+        # alternatively use :url for shorter config
+        # prepend with "papertrail://" or "syslog://"
+        # then host:port/system_name
+
+        config :logger, :logger_papertrail_backend,
+          url: "papertrail://logs.papertrailapp.com:<port>/<system_name>",
+          level: :warn,
+          format: "$metadata $message"
 
         config :logger,
           backends: [ :console,
@@ -44,7 +55,7 @@ Available in [Hex](https://hex.pm). The package can be installed as:
 
 ## Example output:
 
-`Oct 02 14:19:04 Wizard Elixir.UpptecSlack.SlackBot:  [info]   Successfully authenticated as user "wizard" on team "Upptec"`
+`Oct 02 14:19:04 Wizard UpptecSlack.SlackBot:  [info]   Successfully authenticated as user "wizard" on team "Upptec"`
 
 
-Papertrail sets timestamp when message arrives. `Wizard` is `:system_name`. `Elixir.UpptecSlack.SlackBot` is the module sending the log. `[Info]` is level.
+Papertrail sets timestamp when message arrives. `Wizard` is `:system_name`. `UpptecSlack.SlackBot` is the module sending the log. `[Info]` is level.
