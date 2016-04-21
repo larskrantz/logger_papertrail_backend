@@ -1,4 +1,5 @@
 # LoggerPapertrailBackend
+[![Hex.pm](https://img.shields.io/hexpm/v/logger_papertrail_backend.svg?maxAge=2592000)](https://hex.pm/packages/logger_papertrail_backend)
 
 A [Papertrail](https://papertrailapp.com) backend for [Elixir Logger](http://elixir-lang.org/docs/stable/logger/Logger.html).
 
@@ -29,14 +30,15 @@ Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The packa
           system_name: "Wizard",
           format: "$metadata $message"
 
-        # alternatively use :url for shorter config
-        # prepend with "papertrail://" or "syslog://"
-        # then host:port/system_name
+  Alternatively use :url for shorter config.
+  Prepend with "papertrail://" or "syslog://" then host:port/system_name. We normally set an ENV-var: `url: System.get_env("PAPERTRAIL_URL")`
 
         config :logger, :logger_papertrail_backend,
           url: "papertrail://logs.papertrailapp.com:<port>/<system_name>",
           level: :warn,
           format: "$metadata $message"
+
+  Then config `:logger` to use the `LoggerPapertrailBackend.Logger`:
 
         config :logger,
           backends: [ :console,
@@ -44,11 +46,11 @@ Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The packa
           ],
           level: :debug
 
-    * (Required) Follow "Add System" in your Papetrail dashboard to get `:host` values
-    * (Optional) Set `:level` for this backend (overides global `:logger`-setting )
-    * (Optional) Set specific `:system_name` in Papertrail, defaults to current application-name
-    * (Optional) Set :format, defaults to `[$level] $levelpad$metadata $message`, see [Logger.Formatter](http://elixir-lang.org/docs/stable/logger/Logger.Formatter.html)
-    * Other supported options in config are `:colors`, `:metadata`. See :console-docs in [Elixir.Logger](http://elixir-lang.org/docs/stable/logger/Logger.html)
+  * (Required) Follow "Add System" in your Papetrail dashboard to get `:host` values
+  * (Optional) Set `:level` for this backend (overides global `:logger`-setting )
+  * (Optional) Set specific `:system_name` in Papertrail, defaults to current application-name
+  * (Optional) Set :format, defaults to `[$level] $levelpad$metadata $message`, see [Logger.Formatter](http://elixir-lang.org/docs/stable/logger/Logger.Formatter.html)
+  * Other supported options in config are `:colors`, `:metadata`. See :console-docs in [Elixir.Logger](http://elixir-lang.org/docs/stable/logger/Logger.html)
 
 
 
