@@ -7,7 +7,7 @@ A [Papertrail](https://papertrailapp.com) backend for [Elixir Logger](http://eli
 
 ## Installation
 
-Available in [Hex](https://hex.pm). The package can be installed as:
+Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The package can be installed as:
 
   1. Add `logger_papertrail_backend` to your list of dependencies in `mix.exs`:
 
