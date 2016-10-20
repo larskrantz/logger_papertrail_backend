@@ -16,10 +16,10 @@ Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The packa
           [{:logger_papertrail_backend, "~> 0.1.0"}]
         end
 
-  2. Ensure `logger_papertrail_backend` is started before your application:
+  2. Ensure `logger` and `logger_papertrail_backend` is started before your application:
 
         def application do
-          [applications: [:logger_papertrail_backend]]
+          [applications: [:logger, :logger_papertrail_backend]]
         end
 
   3. In your `config.exs` (or in your `#{Mix.env}.exs`-files):
@@ -46,7 +46,7 @@ Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The packa
           ],
           level: :debug
 
-  * (Required) Follow "Add System" in your Papetrail dashboard to get `:host` values
+  * (Required) Follow "Add System" in your Papertrail dashboard to get `:host` values
   * (Optional) Set `:level` for this backend (overides global `:logger`-setting )
   * (Optional) Set specific `:system_name` in Papertrail, defaults to current application-name
   * (Optional) Set :format, defaults to `[$level] $levelpad$metadata $message`, see [Logger.Formatter](http://elixir-lang.org/docs/stable/logger/Logger.Formatter.html)
