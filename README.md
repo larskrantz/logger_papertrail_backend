@@ -3,7 +3,7 @@
 
 A [Papertrail](https://papertrailapp.com) backend for [Elixir Logger](http://elixir-lang.org/docs/stable/logger/Logger.html).
 
-[Change Log](CHANGELOG.md)
+[Changelog](CHANGELOG.md)
 
 
 ## Installation
@@ -45,6 +45,8 @@ Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The packa
             LoggerPapertrailBackend.Logger
           ],
           level: :debug
+
+  _Note: if you have an umbrella project, use your top `config.exs`._
 
   * (Required) Follow "Add System" in your Papertrail dashboard to get `:host` values
   * (Optional) Set `:level` for this backend (overides global `:logger`-setting )
