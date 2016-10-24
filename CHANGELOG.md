@@ -1,6 +1,10 @@
-# Change Log
+# Changelog
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
+
+## [0.1.1] - 2016-10-24
+### Changed
+- Fixed issue #4, if DNS resolution fails (ip is resolved every 60s), it uses last successfully resolved ip.
 
 ## [0.1.0] - 2016-04-18
 ### Added
