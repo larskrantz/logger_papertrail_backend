@@ -2,14 +2,15 @@ defmodule LoggerPapertrailBackend.Sender do
   use GenServer
 
   defmodule State do
-    defstruct hosts: %{}
+    defstruct hosts: %{}, socket: nil
   end
 
   @ip_update_interval_ms 60_000
   def init(_), do: init()
   def init() do
+    {:ok, socket} = :gen_udp.open(0)
     :timer.send_interval(@ip_update_interval_ms, :update_ip)
-    {:ok, %State{}}
+    {:ok, %State{ socket: socket}}
   end
 
   def start_link() do
@@ -18,17 +19,18 @@ defmodule LoggerPapertrailBackend.Sender do
 
    def handle_cast({ :send, message, host, port}, state) when is_integer(port) and is_binary(host) and is_binary(message) do
     { ip, new_state } = get_ip_address(state, host)
-    {:ok, socket} = :gen_udp.open(0)
-    :gen_udp.send(socket, ip, port, message)
-    :gen_udp.close(socket)
+    :gen_udp.send(new_state.socket, ip, port, message)
     { :noreply, new_state }
   end
   def handle_cast({ :send, _message, _host, _port }, state), do: { :noreply, state }
 
   def handle_info(:update_ip, state) do
     updated_state = refresh_ips(state)
-
     { :noreply, updated_state }
+  end
+
+  def terminate(_reason, state) do
+    :gen_udp.close(state.socket)
   end
 
   def send(message, host, port) do
