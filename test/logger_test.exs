@@ -10,7 +10,7 @@ defmodule LoggerPapertrailBackend.LoggerTest do
     :ok = Application.put_env(:logger, :logger_papertrail_backend,
       url: "papertrail://localhost:#{@port}/#{@system_name}")
     Application.ensure_started(:logger)
-    MockPapertrailServer.start(@port, self)
+    MockPapertrailServer.start(@port, self())
     :ok
   end
 
