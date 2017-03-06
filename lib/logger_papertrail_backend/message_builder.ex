@@ -1,14 +1,19 @@
 defmodule LoggerPapertrailBackend.MessageBuilder do
-  @doc ~S"""
-    Will build a syslog-message, roughly conforming to a BSD syslogmessage, RFC 3164.
-    But it is specially fitted to work with PaperTrail, http://papertrailapp.com
+  @moduledoc """
+    Handles building messages that will be sent to Papertrail from Elixir
+  """
+  @doc """
+  Will build a syslog-message, roughly conforming to a BSD syslogmessage, RFC 3164.
+  But it is specially fitted to work with PaperTrail, http://papertrailapp.com
 
-    ## Example
+  ## Example
 
       iex> LoggerPapertrailBackend.MessageBuilder.build("Hello PaperTrail!", :error, "my_system_name", {{2015,10,1}, {12,44,1}}, "Elixir.Hello.World")
       "<11>Oct  1 12:44:01 my_system_name Hello.World Hello PaperTrail!"
   """
-  def build(message,level, hostname, timestamp, tag) do
+
+  @spec build(message :: binary, level :: atom, hostname :: binary, timestamp :: tuple, tag :: any) :: binary
+  def build(message, level, hostname, timestamp, tag) do
     facility = :user # Papertrail does not care it seems, so just use :user
     priority = calculate_priority(facility, level)
     bsd_timestamp = create_bsd_timestamp(timestamp)

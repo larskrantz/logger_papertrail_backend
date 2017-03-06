@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.1.2] - 2017-03-06
+### Changed
+- Merged #7 squashing warnings from Elixir 1.4.
+- Some module documentation
+
 ## [0.1.1] - 2016-10-24
 ### Changed
 - Fixed issue #4, if DNS resolution fails (ip is resolved every 60s), it uses last successfully resolved ip.
