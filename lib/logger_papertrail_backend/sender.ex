@@ -1,11 +1,13 @@
 defmodule LoggerPapertrailBackend.Sender do
+  @moduledoc false
   use GenServer
 
   defmodule State do
+    @moduledoc false
     defstruct hosts: %{}
   end
 
-  @ip_update_interval_ms 60_000
+  @ip_update_interval_ms 60_000 # how often to lookup ip from dns
   def init(_), do: init()
   def init() do
     :timer.send_interval(@ip_update_interval_ms, :update_ip)
@@ -16,19 +18,19 @@ defmodule LoggerPapertrailBackend.Sender do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-   def handle_cast({ :send, message, host, port}, state) when is_integer(port) and is_binary(host) and is_binary(message) do
-    { ip, new_state } = get_ip_address(state, host)
+  def handle_cast({:send, message, host, port}, state) when is_integer(port) and is_binary(host) and is_binary(message) do
+    {ip, new_state} = get_ip_address(state, host)
     {:ok, socket} = :gen_udp.open(0)
     :gen_udp.send(socket, ip, port, message)
     :gen_udp.close(socket)
-    { :noreply, new_state }
+    {:noreply, new_state}
   end
-  def handle_cast({ :send, _message, _host, _port }, state), do: { :noreply, state }
+  def handle_cast({:send, _message, _host, _port }, state), do: { :noreply, state }
 
   def handle_info(:update_ip, state) do
     updated_state = refresh_ips(state)
 
-    { :noreply, updated_state }
+    {:noreply, updated_state}
   end
 
   def send(message, host, port) do
@@ -38,7 +40,7 @@ defmodule LoggerPapertrailBackend.Sender do
   defp refresh_ips(%State{hosts: hosts} = state), do: refresh_ips(Map.keys(hosts), state)
   defp refresh_ips([], state), do: state
   defp refresh_ips([ host | tail], state) do
-    { _, updated_state } = resolve_add_host(state, host)
+    {_, updated_state} = resolve_add_host(state, host)
     refresh_ips(tail, updated_state)
   end
 
@@ -57,10 +59,10 @@ defmodule LoggerPapertrailBackend.Sender do
   defp resolve_add_host(state, host) do
     case resolve_host(host) do
       nil ->  last_resolved_ip = Map.get(state.hosts, host)
-              { last_resolved_ip, state }
+              {last_resolved_ip, state}
       ip ->   new_hosts = Map.put(state.hosts, host, ip)
               new_state = %State{ state | hosts: new_hosts }
-              { ip, new_state }
+              {ip, new_state}
       end
   end
 end
