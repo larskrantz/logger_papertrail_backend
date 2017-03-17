@@ -44,7 +44,7 @@ defmodule LoggerPapertrailBackend.Mixfile do
       maintainers: ["Lars Krantz"],
       licenses: ["MIT"],
       links: %{ "GitHub" => "https://github.com/larskrantz/logger_papertrail_backend",
-                "Logger" => "http://elixir-lang.org/docs/stable/logger/Logger.html",
+                "Logger" => "https://hexdocs.pm/logger/Logger.html",
                 "Papertrail" => "https://papertrailapp.com/"}
     ]
   end
