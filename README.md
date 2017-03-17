@@ -12,42 +12,48 @@ A [Papertrail](https://papertrailapp.com) backend for [Elixir Logger](http://eli
 
 Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The package can be installed as:
 
-  1. Add `logger_papertrail_backend` to your list of dependencies in `mix.exs`:
-
-        def deps do
-          [{:logger_papertrail_backend, "~> 0.1.0"}]
-        end
-
-  2. Ensure `logger` and `logger_papertrail_backend` is started before your application:
-
-        def application do
-          [applications: [:logger, :logger_papertrail_backend]]
-        end
-
-  3. In your `config.exs` (or in your `#{Mix.env}.exs`-files):
-
-        config :logger, :logger_papertrail_backend,
-          host: "logs.papertrailapp.com:<port>",
-          level: :warn,
-          system_name: "Wizard",
-          format: "$metadata $message"
-
+* Add `logger_papertrail_backend` to your list of dependencies in `mix.exs`:
+```elixir
+def deps do
+  [{:logger_papertrail_backend, "~> 0.1.2"}]
+end
+```
+* Ensure `logger` and `logger_papertrail_backend` is started before your application (pre Elixir 1.4):
+```elixir
+def application do
+  [applications: [:logger, :logger_papertrail_backend]]
+end
+```
+* Or after Elixir 1.4, just ensure `Logger` is in `extra_applications`:
+```elixir
+def application do
+  [extra_applications: [:logger]]
+end
+```
+* In your `config.exs` (or in your `#{Mix.env}.exs`-files):
+```elixir
+config :logger, :logger_papertrail_backend,
+  host: "logs.papertrailapp.com:<port>",
+  level: :warn,
+  system_name: "Wizard",
+  format: "$metadata $message"
+```
   Alternatively use :url for shorter config.
   Prepend with "papertrail://" or "syslog://" then host:port/system_name. We normally set an ENV-var: `url: System.get_env("PAPERTRAIL_URL")`
-
-        config :logger, :logger_papertrail_backend,
-          url: "papertrail://logs.papertrailapp.com:<port>/<system_name>",
-          level: :warn,
-          format: "$metadata $message"
-
+```elixir
+config :logger, :logger_papertrail_backend,
+  url: "papertrail://logs.papertrailapp.com:<port>/<system_name>",
+  level: :warn,
+  format: "$metadata $message"
+```
   Then config `:logger` to use the `LoggerPapertrailBackend.Logger`:
-
-        config :logger,
-          backends: [ :console,
-            LoggerPapertrailBackend.Logger
-          ],
-          level: :debug
-
+```elixir
+config :logger,
+  backends: [ :console,
+    LoggerPapertrailBackend.Logger
+  ],
+  level: :debug
+```
   _Note: if you have an umbrella project, use your top `config.exs`._
 
   * (Required) Follow "Add System" in your Papertrail dashboard to get `:host` values
