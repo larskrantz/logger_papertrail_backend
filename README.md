@@ -1,5 +1,7 @@
 # LoggerPapertrailBackend
 [![Hex.pm](https://img.shields.io/hexpm/v/logger_papertrail_backend.svg?maxAge=2592000)](https://hex.pm/packages/logger_papertrail_backend)
+[![Hex.pm](https://img.shields.io/hexpm/dt/logger_papertrail_backend.svg)](https://hex.pm/packages/logger_papertrail_backend)
+[![Build Status](https://travis-ci.org/larskrantz/logger_papertrail_backend.svg?branch=master)](https://travis-ci.org/larskrantz/logger_papertrail_backend)
 
 A [Papertrail](https://papertrailapp.com) backend for [Elixir Logger](http://elixir-lang.org/docs/stable/logger/Logger.html).
 
