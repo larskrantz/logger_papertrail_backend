@@ -39,7 +39,7 @@ config :logger, :logger_papertrail_backend,
   format: "$metadata $message"
 ```
   Alternatively use :url for shorter config.
-  Prepend with "papertrail://" or "syslog://" then host:port/system_name. We normally set an ENV-var: `url: System.get_env("PAPERTRAIL_URL")`
+  Prepend with "papertrail://" or "syslog://" then host:port/system_name. We normally set an ENV-var: `url: System.get_env("PAPERTRAIL_URL")` or ` url: "${PAPERTRAIL_URL}",` if building releases with [Distillery](https://github.com/bitwalker/distillery) and `REPLACE_OS_VARS=true`.
 ```elixir
 config :logger, :logger_papertrail_backend,
   url: "papertrail://logs.papertrailapp.com:<port>/<system_name>",
