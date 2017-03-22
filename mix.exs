@@ -3,7 +3,7 @@ defmodule LoggerPapertrailBackend.Mixfile do
 
   def project do
     [app: :logger_papertrail_backend,
-     version: "0.2.0",
+     version: "0.2.1",
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,

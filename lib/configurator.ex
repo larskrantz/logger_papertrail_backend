@@ -32,27 +32,32 @@ defmodule LoggerPapertrailBackend.Configurator do
   in the form of `[host: "hostname:port", system_name: "my_system_name"]`.
   `system_name` is optional.
   """
-  @spec configure_papertrail_target([{:url, binary}]) :: %Configuration{ host: binary, port: integer, system_name: binary}
-  def configure_papertrail_target([{:url, "syslog://" <> url} | _tail]), do: configure_papertrail_target([{:url,"papertrail://#{url}"}])
-  @spec configure_papertrail_target([{:url, binary}]) :: %Configuration{ host: binary, port: integer, system_name: binary}
-  def configure_papertrail_target([{:url, "papertrail://" <> url} | _tail]) do
+  @spec configure_papertrail_target(configuration :: list) :: %Configuration{ host: binary, port: integer, system_name: binary}
+  def configure_papertrail_target(configuration) when is_list(configuration) do
+    configuration
+    |> Enum.into(%{})
+    |> configure_target
+  end
+  def configure_papertrail_target(configuration), do: configure_target(configuration)
+
+  # private parts
+  defp configure_target(%{url: "syslog://" <> url}), do: configure_target(%{url: "papertrail://#{url}"})
+  defp configure_target(%{url: "papertrail://" <> url}) do
     [host_and_port, system_name] = String.split(url, "/")
     [host, portstr] = String.split(host_and_port,":")
     port = String.to_integer(portstr)
     %Configuration{ host: host, port: port, system_name: system_name }
   end
-  def configure_papertrail_target([{:url, faulty_url} | _tail]) when is_binary(faulty_url) do
+  defp configure_target(%{url: faulty_url}) when is_binary(faulty_url) do
     raise(LoggerPapertrailBackend.ConfigurationError, "Url in format '#{faulty_url}' is not supported as configuration. Please check docs.")
   end
-  @spec configure_papertrail_target([{:host, binary}, {:system_name, binary}]) :: %Configuration{ host: binary, port: integer, system_name: binary}
-  def configure_papertrail_target([{:host, host_config}, {:system_name, system_name}]) do
+  defp configure_target(%{host: host_config, system_name: system_name}) do
     [ host, portstr ] = host_config |> String.split(":")
     {port,_} = Integer.parse(portstr)
     %Configuration{ host: host, port: port, system_name: system_name }
   end
-  @spec configure_papertrail_target([{:host, binary}]) :: %Configuration{ host: binary, port: integer, system_name: binary}
-  def configure_papertrail_target([{:host, host_config}]), do: configure_papertrail_target(host: host_config, system_name: nil)
-  def configure_papertrail_target(config) do
+  defp configure_target(%{host: host_config}), do: configure_target(%{host: host_config, system_name: nil})
+  defp configure_target(config) do
     raise(LoggerPapertrailBackend.ConfigurationError, "Unknown configuration: #{inspect(config)}")
   end
 end
