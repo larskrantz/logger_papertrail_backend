@@ -27,7 +27,7 @@ defmodule LoggerPapertrailBackend.Configurator do
       %LoggerPapertrailBackend.Configuration{host: "logs.papertrail.com", port: 12345, system_name: "my_system_name"}
   """
   @doc """
-  Configures target using `syslog://` or `papertrail://` - scheme as url, or
+  Configures target using a parsable URI as url, or
   or configures target by extracting system-name, host and port from a keywordlist
   in the form of `[host: "hostname:port", system_name: "my_system_name"]`.
   `system_name` is optional.
@@ -35,29 +35,28 @@ defmodule LoggerPapertrailBackend.Configurator do
   @spec configure_papertrail_target(configuration :: list) :: %Configuration{ host: binary, port: integer, system_name: binary}
   def configure_papertrail_target(configuration) when is_list(configuration) do
     configuration
-    |> Enum.into(%{})
+    |> Map.new
     |> configure_target
   end
   def configure_papertrail_target(configuration), do: configure_target(configuration)
 
   # private parts
-  defp configure_target(%{url: "syslog://" <> url}), do: configure_target(%{url: "papertrail://#{url}"})
-  defp configure_target(%{url: "papertrail://" <> url}) do
-    [host_and_port, system_name] = String.split(url, "/")
-    [host, portstr] = String.split(host_and_port,":")
-    port = String.to_integer(portstr)
+  defp configure_target(%{url: url}), do: configure_target(URI.parse(url))
+  defp configure_target(%URI{host: host, path: path, port: port}) do
+    system_name = path |> clean_path
     %Configuration{ host: host, port: port, system_name: system_name }
-  end
-  defp configure_target(%{url: faulty_url}) when is_binary(faulty_url) do
-    raise(LoggerPapertrailBackend.ConfigurationError, "Url in format '#{faulty_url}' is not supported as configuration. Please check docs.")
   end
   defp configure_target(%{host: host_config, system_name: system_name}) do
-    [ host, portstr ] = host_config |> String.split(":")
-    {port,_} = Integer.parse(portstr)
-    %Configuration{ host: host, port: port, system_name: system_name }
+    "papertrail://#{host_config}/#{system_name}"
+    |> URI.parse
+    |> configure_target
   end
   defp configure_target(%{host: host_config}), do: configure_target(%{host: host_config, system_name: nil})
   defp configure_target(config) do
     raise(LoggerPapertrailBackend.ConfigurationError, "Unknown configuration: #{inspect(config)}")
   end
+
+  defp clean_path("/"), do: nil
+  defp clean_path("/" <> rest), do: rest
+  defp clean_path(_), do: nil
 end

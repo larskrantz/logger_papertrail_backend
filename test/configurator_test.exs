@@ -1,24 +1,20 @@
 defmodule LoggerPapertrailBackend.ConfiguratorTest do
   use ExUnit.Case, async: true
-  doctest LoggerPapertrailBackend.Configurator
+  alias LoggerPapertrailBackend.{Configuration, Configurator, ConfigurationError}
+  doctest Configurator
 
-  test "should raise ConfigurationError if url is not supported" do
-    assert_raise LoggerPapertrailBackend.ConfigurationError, "Url in format 'http://foo.bar:80' is not supported as configuration. Please check docs.", fn ->
-      LoggerPapertrailBackend.Configurator.configure_papertrail_target(url: "http://foo.bar:80")
-    end
-  end
   test "should raise if config is totally wrong" do
-    assert_raise LoggerPapertrailBackend.ConfigurationError, fn ->
-      LoggerPapertrailBackend.Configurator.configure_papertrail_target("hello world")
+    assert_raise ConfigurationError, fn ->
+      Configurator.configure_papertrail_target("hello world")
     end
   end
   test "should be able to use host-type configuration" do
     config = [ host: "somehost:2810", level: :info, system_name: "app" ]
-    assert %LoggerPapertrailBackend.Configuration{host: "somehost", port: 2810, system_name: "app"} == LoggerPapertrailBackend.Configurator.configure_papertrail_target(config)
+    assert %Configuration{host: "somehost", port: 2810, system_name: "app"} == Configurator.configure_papertrail_target(config)
   end
   test "should be able to use url-format with papertrail as schema" do
     config = [ url: "papertrail://somehost:667/my_app", level: :info]
-    assert %LoggerPapertrailBackend.Configuration{host: "somehost", port: 667, system_name: "my_app"} == LoggerPapertrailBackend.Configurator.configure_papertrail_target(config)
+    assert %Configuration{host: "somehost", port: 667, system_name: "my_app"} == Configurator.configure_papertrail_target(config)
   end
   test "host-config from readme should work" do
     config = [
@@ -27,7 +23,7 @@ defmodule LoggerPapertrailBackend.ConfiguratorTest do
       system_name: "Wizard",
       format: "$metadata $message"
     ]
-    assert %LoggerPapertrailBackend.Configuration{host: "logs.papertrailapp.com", port: 11, system_name: "Wizard"} == LoggerPapertrailBackend.Configurator.configure_papertrail_target(config)
+    assert %Configuration{host: "logs.papertrailapp.com", port: 11, system_name: "Wizard"} == Configurator.configure_papertrail_target(config)
   end
   test "url-config from readme should work" do
     config = [
@@ -35,6 +31,18 @@ defmodule LoggerPapertrailBackend.ConfiguratorTest do
       level: :warn,
       format: "$metadata $message"
     ]
-    assert %LoggerPapertrailBackend.Configuration{host: "logs.papertrailapp.com", port: 11, system_name: "Wizard"} == LoggerPapertrailBackend.Configurator.configure_papertrail_target(config)
+    assert %Configuration{host: "logs.papertrailapp.com", port: 11, system_name: "Wizard"} == Configurator.configure_papertrail_target(config)
+  end
+  test "system_name is optional in host config" do
+    config = [
+      host: "somehost:22",
+    ]
+    assert %Configuration{host: "somehost", port: 22, system_name: nil} == Configurator.configure_papertrail_target(config)
+  end
+  test "system_name is optional in url config" do
+    config = [
+      url: "papertrail://somehost:22"
+    ]
+    assert %Configuration{host: "somehost", port: 22, system_name: nil} == Configurator.configure_papertrail_target(config)
   end
 end
