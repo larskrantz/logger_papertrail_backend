@@ -35,7 +35,7 @@ defmodule LoggerPapertrailBackend.Configurator do
   @spec configure_papertrail_target(configuration :: list) :: %Configuration{ host: binary, port: integer, system_name: binary}
   def configure_papertrail_target(configuration) when is_list(configuration) do
     configuration
-    |> Map.new
+    |> Enum.into(%{})
     |> configure_target
   end
   def configure_papertrail_target(configuration), do: configure_target(configuration)
