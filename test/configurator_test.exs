@@ -1,6 +1,9 @@
 defmodule LoggerPapertrailBackend.ConfiguratorTest do
   use ExUnit.Case, async: true
-  alias LoggerPapertrailBackend.{Configuration, Configurator, ConfigurationError}
+  alias LoggerPapertrailBackend.Configuration
+  alias LoggerPapertrailBackend.Configurator
+  alias LoggerPapertrailBackend.ConfigurationError
+
   doctest Configurator
 
   test "should raise if config is totally wrong" do
