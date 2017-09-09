@@ -1,5 +1,5 @@
 defmodule LoggerPapertrailBackend.Logger do
-  use GenEvent
+  @behaviour :gen_event
   import LoggerPapertrailBackend.Configurator
   @moduledoc false
 
