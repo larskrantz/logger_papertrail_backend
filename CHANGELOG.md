@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - 2017-10-05
+### Changed
+- Using behavior `:gen_event` since `GenEvent` is deprecated
+- Squash warnings from deprecated String-functions
+- Requires Elixir ~> 1.3
+
 ## [0.2.1] - 2017-03-19
 ### Fixed
 - An issue with configuration, issue #9
