@@ -24,14 +24,14 @@ defmodule LoggerPapertrailBackend.MessageBuilder do
   defp create_bsd_timestamp({date,{h,m,s,_ms}}), do: create_bsd_timestamp({date,{h,m,s}})
   defp create_bsd_timestamp({{_y,mo,d},{h,m,s}}) do
     months = ~W{Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec}
-    padded_day = d |> Integer.to_string |> String.rjust(2)
+    padded_day = d |> Integer.to_string |> String.pad_leading(2)
     month = months |> Enum.at(mo-1)
-    zeropad = fn(i) -> i |> Integer.to_string |> String.rjust(2, ?0) end
+    zeropad = fn(i) -> i |> Integer.to_string |> String.pad_leading(2, "0") end
     "#{month} #{padded_day} #{zeropad.(h)}:#{zeropad.(m)}:#{zeropad.(s)}"
   end
 
   defp trim_tag(tag) when is_binary(tag) do
-    stripped = tag |> String.strip() |> String.replace("Elixir.", "")
+    stripped = tag |> String.trim() |> String.replace("Elixir.", "")
     trim_tag(stripped, String.length(stripped))
   end
   defp trim_tag(tag), do: trim_tag("#{tag}")

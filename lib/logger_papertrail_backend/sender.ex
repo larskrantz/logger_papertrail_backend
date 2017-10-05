@@ -53,7 +53,7 @@ defmodule LoggerPapertrailBackend.Sender do
     end
   end
   defp resolve_host(host) do
-    case :inet.getaddr(String.to_char_list(host), :inet) do
+    case :inet.getaddr(String.to_charlist(host), :inet) do
       { :ok, ip } -> ip
       _ -> nil
     end
