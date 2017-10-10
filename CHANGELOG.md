@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.1] - 2017-10-09
+### Fixed
+- Issue #14, crashes when receiving unhandled messages in handle_info. Now ignoring unhandled `info`, `events`, `code_change` and `terminate` to actually behave as a `:gen_event`.
+
 ## [1.0.0] - 2017-10-05
 ### Changed
 - Using behavior `:gen_event` since `GenEvent` is deprecated
