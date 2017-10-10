@@ -43,6 +43,15 @@ defmodule LoggerPapertrailBackend.Logger do
     {:ok, state}
   end
 
+  def code_change(_old_vsn, state, _extra) do
+    {:ok, state}
+  end
+
+  def terminate(_reason, _state) do
+    :ok
+  end
+
+
   ## Helpers
 
   defp meet_level?(_lvl, nil), do: true
