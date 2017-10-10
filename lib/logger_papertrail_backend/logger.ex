@@ -35,6 +35,13 @@ defmodule LoggerPapertrailBackend.Logger do
     end
     {:ok, state}
   end
+  def handle_event(_, state) do
+    {:ok, state}
+  end
+
+  def handle_info(_, state) do
+    {:ok, state}
+  end
 
   ## Helpers
 
