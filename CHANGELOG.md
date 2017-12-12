@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.2] - 2017-12-12
+### Fixed
+- Issue #15, map elixir level :warn to correct syslog level
+
 ## [1.0.1] - 2017-10-09
 ### Fixed
 - Issue #14, crashes when receiving unhandled messages in handle_info. Now ignoring unhandled `info`, `events`, `code_change` and `terminate` to actually behave as a `:gen_event`.

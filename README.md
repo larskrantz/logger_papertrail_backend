@@ -15,7 +15,7 @@ Available in [Hex](https://hex.pm/packages/logger_papertrail_backend). The packa
 * Add `logger_papertrail_backend` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
-  [{:logger_papertrail_backend, "~> 1.0.1"}]
+  [{:logger_papertrail_backend, "~> 1.0"}]
 end
 ```
 * Ensure `logger` and `logger_papertrail_backend` is started before your application (pre Elixir 1.4):
