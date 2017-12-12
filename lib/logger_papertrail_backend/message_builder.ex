@@ -55,6 +55,7 @@ defmodule LoggerPapertrailBackend.MessageBuilder do
 
   # Thanks to https://github.com/jkvor/erlang_syslog/blob/master/src/syslog.erl
 
+  defp level(:warn), do: level(:warning) # map elixir :warn to :warning
   defp level(:emergency), do: 0 # system is unusable
   defp level(:alert), do: 1 # action must be taken immediately
   defp level(:critical), do: 2 # critical conditions
