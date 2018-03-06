@@ -6,16 +6,16 @@ defmodule LoggerPapertrailBackend.Configurator do
   It works with syslog:// as scheme too.
 
   In your config, choose between
-```elixir
-    config :logger, :logger_papertrail_backend,
-      url: "papertrail://logs.papertrail.com:12345/my_system_name"
-```
+  ```elixir
+  config :logger, :logger_papertrail_backend,
+    url: "papertrail://logs.papertrail.com:12345/my_system_name"
+  ```
   or
-``` elixir
-    config :logger, :logger_papertrail_backend,
-      host: "logs.papertrailapp.com:12345",
-      system_name: my_system_name
-```
+  ``` elixir
+  config :logger, :logger_papertrail_backend,
+    host: "logs.papertrailapp.com:12345",
+    system_name: my_system_name
+  ```
   ### Example
 
       iex> config = [url: "papertrail://logs.papertrail.com:12345/my_system_name"]
