@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.3] - 2018-03-06
+### Changed
+- Merged #16 from @mkrogemann, squashing `warning: outdented heredoc line` in Elixir 1.6
+
 ## [1.0.2] - 2017-12-12
 ### Fixed
 - Issue #15, map elixir level :warn to correct syslog level
