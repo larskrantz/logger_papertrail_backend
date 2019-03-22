@@ -29,8 +29,8 @@ defmodule LoggerPapertrailBackend.Logger do
     {:ok, state}
   end
 
-  def handle_event({level, _gl, {Logger, msg, ts, md}}, state) do
-    if meet_level?(level, state.level) do
+  def handle_event({level, _gl, {Logger, msg, ts, md}}, %{metadata_filter: metadata_filter} = state) do
+    if meet_level?(level, state.level) and metadata_matches?(md, metadata_filter) do
       log_event(level, msg, ts, md, state)
     end
     {:ok, state}
@@ -75,14 +75,21 @@ defmodule LoggerPapertrailBackend.Logger do
 
     level    = Keyword.get(config, :level)
     metadata = Keyword.get(config, :metadata, [])
+    metadata_filter = Keyword.get(config, :metadata_filter)
 
     target_config = configure_papertrail_target(config)
 
     colors   = configure_colors(config)
 
-    %{format: format, metadata: metadata,
-      level: level, colors: colors, device: device,
-      host: target_config.host, port: target_config.port, system_name: target_config.system_name }
+    %{format: format,
+      metadata: metadata,
+      metadata_filter: metadata_filter,
+      level: level,
+      colors: colors,
+      device: device,
+      host: target_config.host,
+      port: target_config.port,
+      system_name: target_config.system_name }
   end
 
   defp configure_merge(env, options) do
@@ -102,8 +109,19 @@ defmodule LoggerPapertrailBackend.Logger do
   end
 
 
-  defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name } = state) do
-    application = system_name || Keyword.get(md, :application, "unknown_elixir_application")
+  defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name, metadata_filter: metadata_filter} = state) do
+    application =
+      [
+        # From metadata
+        Keyword.get(md, :system_name),
+        # From config
+        system_name,
+        # From running application
+        Keyword.get(md, :application),
+        # Default
+        "unknown_elixir_application"
+      ]
+      |> Enum.find(& &1)
     procid = Keyword.get(md, :module, nil)
 
     format_event(level, msg, ts, md, state)
@@ -129,5 +147,15 @@ defmodule LoggerPapertrailBackend.Logger do
 
   defp color_event(data, level, %{enabled: true} = colors) do
     [IO.ANSI.format_fragment(Map.fetch!(colors, level), true), data | IO.ANSI.reset]
+  end
+
+  def metadata_matches?(_md, nil), do: true
+  def metadata_matches?(_md, []), do: true # all of the filter keys are present
+  def metadata_matches?(md, [{key, val}|rest]) do
+    case Keyword.fetch(md, key) do
+      {:ok, ^val} ->
+        metadata_matches?(md, rest)
+      _ -> false #fail on first mismatch
+    end
   end
 end

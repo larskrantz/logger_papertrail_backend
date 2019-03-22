@@ -26,4 +26,11 @@ defmodule LoggerPapertrailBackend.LoggerTest do
     assert_receive {:ok, message}, 5000
     assert String.contains?(message, @system_name)
   end
+
+  test "can overwrite system name" do
+    Logger.warn("Look, another system name", system_name: "a_new_system_name")
+    assert_receive {:ok, message}, 5000
+    refute String.contains?(message, @system_name)
+    assert String.contains?(message, "a_new_system_name")
+  end
 end
