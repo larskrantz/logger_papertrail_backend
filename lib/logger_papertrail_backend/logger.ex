@@ -109,7 +109,7 @@ defmodule LoggerPapertrailBackend.Logger do
   end
 
 
-  defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name, metadata_filter: metadata_filter} = state) do
+  defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name} = state) do
     application =
       [
         # From metadata
@@ -149,9 +149,9 @@ defmodule LoggerPapertrailBackend.Logger do
     [IO.ANSI.format_fragment(Map.fetch!(colors, level), true), data | IO.ANSI.reset]
   end
 
-  def metadata_matches?(_md, nil), do: true
-  def metadata_matches?(_md, []), do: true # all of the filter keys are present
-  def metadata_matches?(md, [{key, val}|rest]) do
+  defp metadata_matches?(_md, nil), do: true
+  defp metadata_matches?(_md, []), do: true # all of the filter keys are present
+  defp metadata_matches?(md, [{key, val}|rest]) do
     case Keyword.fetch(md, key) do
       {:ok, ^val} ->
         metadata_matches?(md, rest)
