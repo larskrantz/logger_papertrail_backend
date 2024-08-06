@@ -21,7 +21,7 @@ defmodule LoggerPapertrailBackend.Logger do
   end
 
   def handle_call({:configure, options}, state) do
-   state = configure(state.device, options)
+    state = configure(state.device, options)
     {:ok, :ok, state}
   end
 
@@ -29,12 +29,17 @@ defmodule LoggerPapertrailBackend.Logger do
     {:ok, state}
   end
 
-  def handle_event({level, _gl, {Logger, msg, ts, md}}, %{metadata_filter: metadata_filter} = state) do
+  def handle_event(
+        {level, _gl, {Logger, msg, ts, md}},
+        %{metadata_filter: metadata_filter} = state
+      ) do
     if meet_level?(level, state.level) and metadata_matches?(md, metadata_filter) do
       log_event(level, msg, ts, md, state)
     end
+
     {:ok, state}
   end
+
   def handle_event(_, state) do
     {:ok, state}
   end
@@ -50,7 +55,6 @@ defmodule LoggerPapertrailBackend.Logger do
   def terminate(_reason, _state) do
     :ok
   end
-
 
   ## Helpers
 
@@ -71,17 +75,18 @@ defmodule LoggerPapertrailBackend.Logger do
 
     format =
       Keyword.get(config, :format, @default_format)
-      |> Logger.Formatter.compile
+      |> Logger.Formatter.compile()
 
-    level    = Keyword.get(config, :level)
+    level = Keyword.get(config, :level)
     metadata = Keyword.get(config, :metadata, [])
     metadata_filter = Keyword.get(config, :metadata_filter)
 
     target_config = configure_papertrail_target(config)
 
-    colors   = configure_colors(config)
+    colors = configure_colors(config)
 
-    %{format: format,
+    %{
+      format: format,
       metadata: metadata,
       metadata_filter: metadata_filter,
       level: level,
@@ -89,7 +94,8 @@ defmodule LoggerPapertrailBackend.Logger do
       device: device,
       host: target_config.host,
       port: target_config.port,
-      system_name: target_config.system_name }
+      system_name: target_config.system_name
+    }
   end
 
   defp configure_merge(env, options) do
@@ -100,15 +106,18 @@ defmodule LoggerPapertrailBackend.Logger do
   end
 
   defp configure_colors(config) do
+    IO.inspect("Kieran Test")
     colors = Keyword.get(config, :colors, [])
-    %{debug: Keyword.get(colors, :debug, :cyan),
+
+    %{
+      debug: Keyword.get(colors, :debug, :cyan),
       info: Keyword.get(colors, :info, :normal),
       warn: Keyword.get(colors, :warn, :yellow),
       warning: Keyword.get(colors, :warn, :yellow),
       error: Keyword.get(colors, :error, :red),
-      enabled: Keyword.get(colors, :enabled, IO.ANSI.enabled?)}
+      enabled: Keyword.get(colors, :enabled, IO.ANSI.enabled?())
+    }
   end
-
 
   defp log_event(level, msg, ts, md, %{colors: colors, system_name: system_name} = state) do
     application =
@@ -123,12 +132,13 @@ defmodule LoggerPapertrailBackend.Logger do
         "unknown_elixir_application"
       ]
       |> Enum.find(& &1)
+
     procid = Keyword.get(md, :module, nil)
 
     format_event(level, msg, ts, md, state)
-      |> color_event(level, colors)
-      |> LoggerPapertrailBackend.MessageBuilder.build(level, application, ts, procid)
-      |> LoggerPapertrailBackend.Sender.send(state.host, state.port)
+    |> color_event(level, colors)
+    |> LoggerPapertrailBackend.MessageBuilder.build(level, application, ts, procid)
+    |> LoggerPapertrailBackend.Sender.send(state.host, state.port)
   end
 
   defp format_event(level, msg, ts, md, %{format: format, metadata: keys}) do
@@ -139,24 +149,30 @@ defmodule LoggerPapertrailBackend.Logger do
     Enum.reduce(keys, [], fn key, acc ->
       case Keyword.fetch(metadata, key) do
         {:ok, val} -> [{key, val} | acc]
-        :error     -> acc
+        :error -> acc
       end
-    end) |> Enum.reverse()
+    end)
+    |> Enum.reverse()
   end
 
   defp color_event(data, _level, %{enabled: false}), do: data
 
   defp color_event(data, level, %{enabled: true} = colors) do
-    [IO.ANSI.format_fragment(Map.fetch!(colors, level), true), data | IO.ANSI.reset]
+    [IO.ANSI.format_fragment(Map.fetch!(colors, level), true), data | IO.ANSI.reset()]
   end
 
   defp metadata_matches?(_md, nil), do: true
-  defp metadata_matches?(_md, []), do: true # all of the filter keys are present
-  defp metadata_matches?(md, [{key, val}|rest]) do
+  # all of the filter keys are present
+  defp metadata_matches?(_md, []), do: true
+
+  defp metadata_matches?(md, [{key, val} | rest]) do
     case Keyword.fetch(md, key) do
       {:ok, ^val} ->
         metadata_matches?(md, rest)
-      _ -> false #fail on first mismatch
+
+      # fail on first mismatch
+      _ ->
+        false
     end
   end
 end
