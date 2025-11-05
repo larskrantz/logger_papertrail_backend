@@ -2,7 +2,7 @@
 
 [![Hex.pm](https://img.shields.io/hexpm/v/logger_papertrail_backend.svg?maxAge=2592000)](https://hex.pm/packages/logger_papertrail_backend)
 [![Hex.pm](https://img.shields.io/hexpm/dt/logger_papertrail_backend.svg)](https://hex.pm/packages/logger_papertrail_backend)
-[![Build Status](https://travis-ci.org/larskrantz/logger_papertrail_backend.svg?branch=master)](https://travis-ci.org/larskrantz/logger_papertrail_backend)
+[![CI](https://github.com/larskrantz/logger_papertrail_backend/actions/workflows/ci.yml/badge.svg)](https://github.com/larskrantz/logger_papertrail_backend/actions/workflows/ci.yml)
 
 A [Papertrail](https://papertrailapp.com) backend for [Elixir Logger](http://elixir-lang.org/docs/stable/logger/Logger.html).
 
@@ -20,15 +20,7 @@ def deps do
 end
 ```
 
-* Ensure `logger` and `logger_papertrail_backend` is started before your application (pre Elixir 1.4):
-
-```elixir
-def application do
-  [applications: [:logger, :logger_papertrail_backend]]
-end
-```
-
-* Or after Elixir 1.4, just ensure `Logger` is in `extra_applications`:
+* Ensure `Logger` is in `extra_applications`:
 
 ```elixir
 def application do

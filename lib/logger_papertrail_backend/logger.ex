@@ -7,6 +7,7 @@ defmodule LoggerPapertrailBackend.Logger do
 
   @default_format "[$level] $levelpad$metadata $message"
 
+  @impl true
   def init(__MODULE__) do
     if Process.whereis(:user) do
       init({:user, []})
@@ -15,38 +16,46 @@ defmodule LoggerPapertrailBackend.Logger do
     end
   end
 
+  @impl true
   def init({device, opts}) do
     state = configure(device, opts)
     {:ok, state}
   end
 
+  @impl true
   def handle_call({:configure, options}, state) do
    state = configure(state.device, options)
     {:ok, :ok, state}
   end
 
+  @impl true
   def handle_event({_level, gl, _event}, state) when node(gl) != node() do
     {:ok, state}
   end
 
+  @impl true
   def handle_event({level, _gl, {Logger, msg, ts, md}}, %{metadata_filter: metadata_filter} = state) do
     if meet_level?(level, state.level) and metadata_matches?(md, metadata_filter) do
       log_event(level, msg, ts, md, state)
     end
     {:ok, state}
   end
+  @impl true
   def handle_event(_, state) do
     {:ok, state}
   end
 
+  @impl true
   def handle_info(_, state) do
     {:ok, state}
   end
 
+  @impl true
   def code_change(_old_vsn, state, _extra) do
     {:ok, state}
   end
 
+  @impl true
   def terminate(_reason, _state) do
     :ok
   end

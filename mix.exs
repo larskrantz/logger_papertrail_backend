@@ -1,23 +1,25 @@
-defmodule LoggerPapertrailBackend.Mixfile do
+defmodule LoggerPapertrailBackend.MixProject do
   use Mix.Project
 
   def project do
-    [app: :logger_papertrail_backend,
-     version: "1.1.0",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     description: description(),
-     package: package(),
-     deps: deps()]
+    [
+      app: :logger_papertrail_backend,
+      version: "1.1.0",
+      elixir: "~> 1.18",
+      description: description(),
+      package: package(),
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [],
-    mod: { LoggerPapertrailBackend, []}]
+    [
+      extra_applications: [:logger],
+      mod: {LoggerPapertrailBackend, []}
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -30,7 +32,9 @@ defmodule LoggerPapertrailBackend.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:ex_doc, ">= 0.0.0", only: :dev}]
+    [
+      {:ex_doc, "~> 0.36", only: :dev, runtime: false}
+    ]
   end
 
   defp description do

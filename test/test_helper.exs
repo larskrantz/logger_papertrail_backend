@@ -1,6 +1,6 @@
 defmodule MockPapertrailServer do
   def start(port, receiver) do
-    spawn(fn() -> server(port, receiver) end)
+    spawn(fn -> server(port, receiver) end)
     :timer.sleep(10)
   end
 

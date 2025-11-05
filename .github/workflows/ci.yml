@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Test on Elixir ${{matrix.elixir}} / OTP ${{matrix.otp}}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        elixir: ['1.18', '1.17', '1.16']
+        otp: ['27', '26', '25']
+        exclude:
+          # OTP 27 requires Elixir >= 1.17
+          - elixir: '1.16'
+            otp: '27'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{matrix.elixir}}
+          otp-version: ${{matrix.otp}}
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Run tests
+        run: mix test
+
+      - name: Check formatting
+        run: mix format --check-formatted
+        if: matrix.elixir == '1.18' && matrix.otp == '27'
